@@ -1,0 +1,184 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+
+/* Catppuccin Mocha Palette */
+:root {
+  --rosewater: #f5e0dc;
+  --flamingo: #f2cdcd;
+  --pink: #f5c2e7;
+  --mauve: #cba6f7;
+  --red: #f38ba8;
+  --maroon: #eba0ac;
+  --peach: #fab387;
+  --yellow: #f9e2af;
+  --green: #a6e3a1;
+  --teal: #94e2d5;
+  --sky: #89dceb;
+  --sapphire: #74c7ec;
+  --blue: #89b4fa;
+  --lavender: #b4befe;
+  --text: #cdd6f4;
+  --subtext: #a6adc8;
+  --overlay0: #6c7086;
+  --surface0: #313244;
+  --surface1: #45475a;
+  --surface2: #585b70;
+  --base: #1e1e2e;
+  --mantle: #181825;
+  --crust: #11111b;
+  --accent: var(--green);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: linear-gradient(180deg, var(--crust), var(--mantle) 30%, var(--crust) 100%);
+  color: var(--text);
+  font: 16px/1.45 "Plus Jakarta Sans", sans-serif;
+  min-height: 100vh;
+  display: grid;
+  place-items: start center;
+  padding: 24px;
+}
+
+.app {
+  width: min(980px, 100%);
+}
+.card {
+  background: color-mix(in oklab, var(--base) 88%, black 0%);
+  border: 1px solid var(--surface1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+p.lead {
+  margin: 0 0 18px;
+  color: var(--subtext);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-12 {
+  grid-column: span 12;
+}
+@media (max-width: 760px) {
+  .col-4,
+  .col-6 {
+    grid-column: span 12;
+  }
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--subtext);
+  margin: 10px 0 6px;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  background: var(--surface0);
+  color: var(--text);
+  border: 1px solid var(--surface1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: 0.15s border, 0.15s box-shadow;
+  appearance: none;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--blue) 25%, transparent);
+}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(70%) sepia(20%) saturate(300%) hue-rotate(90deg);
+  cursor: pointer;
+}
+textarea {
+  min-height: 220px;
+  white-space: pre-wrap;
+  font-family: inherit; /* <- emoji will render using system-ui */
+}
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+button {
+  appearance: none;
+  border: 1px solid var(--surface1);
+  background: var(--surface0);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.15s transform, 0.15s background, 0.15s border;
+}
+button.primary {
+  background: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 70%, black 0%);
+  color: #0b0b0b;
+  font-weight: 700;
+}
+button:hover {
+  transform: translateY(-1px);
+}
+.badge {
+  font-size: 12px;
+  color: var(--crust);
+  background: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--accent) 70%, black 0%);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.divider {
+  height: 1px;
+  background: var(--surface1);
+  margin: 16px 0;
+}
+.hint {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--overlay0);
+}
+.inline-hint {
+  font-size: 11px;
+  color: var(--overlay0);
+  margin-top: 4px;
+}
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #f38ba8; /* Catppuccin red */
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(20px);
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
