@@ -318,7 +318,7 @@
           try {
             await navigator.clipboard.writeText(text);
             const originalText = DOM.btnCopy.textContent;
-            DOM.btnCopy.textContent = "Copied ✓";
+            DOM.btnCopy.textContent = "Tersalin ✓";
             setTimeout(() => (DOM.btnCopy.textContent = originalText), 1500);
           } catch {
             showToast("Gagal menyalin. Silakan salin manual.");
