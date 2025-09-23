@@ -9,15 +9,14 @@
   <body>
     <div class="app">
       <div class="card">
-        <h1>Generator Template for Whatsapp</h1>
-        <p class="lead">Pilih template → isi field → <span class="badge">Generate</span> → <strong>Copy</strong>.</p>
+        <h1>Generator Template WhatsApp</h1>
+        <p class="lead">Pilih template → Isi kolom → <span class="badge">Buat</span> → <strong>Salin</strong>.</p>
 
         <div class="grid">
           <div class="col-6">
             <label for="tpl">Pilih Template</label>
             <select id="tpl"></select>
           </div>
-          <div class="col-6"></div>
         </div>
 
         <div id="fields" class="grid" style="margin-top: 10px"></div>
@@ -33,19 +32,17 @@
         ></textarea>
 
         <div class="toolbar">
-          <button class="primary" id="btn-gen">Generate</button>
-          <button id="btn-copy">Copy</button>
+          <button class="primary" id="btn-gen">Buat Template</button>
+          <button id="btn-copy">Salin Teks</button>
           <button id="btn-wa">Buka di WhatsApp</button>
         </div>
 
-        <div class="hint">Catatan: Format *bold* akan terbawa sesuai format WhatsApp.</div>
+        <div class="hint">Catatan: Format *tebal* dan lainnya akan terbawa sesuai format WhatsApp.</div>
       </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <!-- Datalist -->
     <datalist id="vendor-list">
       <option value="Jeje"></option>
       <option value="Vendor A"></option>
@@ -53,369 +50,306 @@
     </datalist>
 
     <script>
-      // --------------------------
-      // DOM helpers & constants
-      // --------------------------
-      const $ = (q) => document.querySelector(q);
+      (function () {
+        "use strict";
 
-      const DAYS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const MONTHS = [
-        "Januari",
-        "Februari",
-        "Maret",
-        "April",
-        "Mei",
-        "Juni",
-        "Juli",
-        "Agustus",
-        "September",
-        "Oktober",
-        "November",
-        "Desember",
-      ];
+        const $ = (selector) => document.querySelector(selector);
 
-      // robust Indonesia flag (works even if file encoding changes)
-      const ID_FLAG = "\uD83C\uDDEE\uD83C\uDDE9";
+        const DOM = {
+          tplSelect: $("#tpl"),
+          fieldsContainer: $("#fields"),
+          output: $("#output"),
+          btnGen: $("#btn-gen"),
+          btnCopy: $("#btn-copy"),
+          btnWa: $("#btn-wa"),
+          toast: $("#toast"),
+        };
 
-      // --------------------------
-      // Utils (pure functions)
-      // --------------------------
-      /** YYYY-MM-DD (local) */
-      function todayLocalISO() {
-        const d = new Date();
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${day}`;
-      }
+        const DAYS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const MONTHS = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+        const ID_FLAG = "\uD83C\uDDEE\uD83C\uDDE9"; // TEMPLATES DEFINITION (REVISED FOR CONSISTENCY) // =================================================
 
-      /** Parse an ISO date (YYYY-MM-DD) as local date to avoid TZ shift */
-      function parseDateLocal(iso) {
-        const [y, m, d] = iso.split("-").map(Number);
-        return new Date(y, m - 1, d);
-      }
+        // =================================================
+        const templates = [
+          {
+            id: "unit-bjm-masuk",
+            name: "Template Unit Banjarmasin Masuk",
+            fields: [
+              { key: "tanggal", label: "Tanggal", type: "date", span: 6 },
+              { key: "jam", label: "Jam (24h, WITA)", type: "time-24", span: 6 },
+              { key: "nopol", label: "Nopol", span: 6 },
+              { key: "vendor", label: "Vendor", span: 6, default: "Jeje", datalist: "vendor-list" },
+            ],
+            render: ({ greet, tanggal, hari, nopol, vendor, jam }) => {
+              const lines = [
+                `*Selamat ${greet}* ${ID_FLAG}`,
+                `*SPX DC Balikpapan >< PT. KRESNA JAGANNATHA MANDIRI*`,
+                "",
+                "*Mohon izin melaporkan*",
+                `*Hari   :* ${hari}`,
+                `*Tanggal  :* ${tanggal}`,
+                `*Nopol  :* ${nopol}`,
+                `*Vendor  :* ${vendor}`,
+                `*Jam   :* ${jam} WITA`,
+                `*Catatan :* Telah tiba di Balikpapan Barat DC`,
+                "",
+                "@~Rizky",
+                "@~rickyv satwika",
+                "@+62 877-7624-0125",
+              ];
+              return lines.join("\n");
+            },
+          },
+          {
+            id: "patroli",
+            name: "Template Patroli",
+            fields: [
+              { key: "tanggal", label: "Tanggal", type: "date", span: 6 },
+              { key: "jam", label: "Pukul (24h, WITA)", type: "time-24", span: 6 },
+              { key: "petugas", label: "Petugas", span: 6 },
+              { key: "regu", label: "Regu", span: 6, default: "2" },
+            ],
+            render: ({ greet, tanggal, hari, jam, petugas, regu }) => {
+              const lines = [
+                "*PT.KRESNA JAGANNATHA MANDIRI*",
+                "_________________________________",
+                "*SPX EXPRESS BALIKPAPAN BARAT DC*",
+                "_________________________________",
+                `*Selamat ${greet}* Komandan KJM / Pimpinan SPX`,
+                "Mohon izin melaporkan, Komandan",
+                "",
+                `*Hari   :* ${hari}`,
+                `*Tanggal  :* ${tanggal}`,
+                `*Pukul  :* ${jam} WITA`,
+                `*Lokasi  :* Balikpapan Barat DC`,
+                `*Perihal :* Pengecekan personel di setiap lantai dan patroli situasi gudang SPX Express Balikpapan Barat DC`,
+                "",
+                `*Petugas :* ( ${petugas} ) Regu ${regu}`,
+                "",
+                "*Keterangan*",
+                "• Patroli di seluruh area SPX EXPRESS BALIKPAPAN BARAT DC",
+                "• Situasi area aman kondusif.",
+                "• Inventaris dalam keadaan lengkap dan aman",
+              ];
+              return lines.join("\n");
+            },
+          },
+          {
+            id: "loker",
+            name: "Template Loker (Inventaris Security)",
+            fields: [{ key: "tanggalfull", label: "Hari, Tanggal", type: "date", span: 6 }],
+            render: ({ greet, tanggalfull }) => {
+              const lines = [
+                `*Selamat ${greet} Komandan*`,
+                "*SPX DC Balikpapan >< PT. KRESNA JAGANNATHA MANDIRI*",
+                "",
+                `*${tanggalfull}*`,
+                "Mohon izin melaporkan kelengkapan inventaris Security",
+                "",
+                "Rincian inventaris :",
+                "• 1 Jas hujan warna kuning",
+                "• 1 Stel sepatu boots",
+                "• 2 HT Wlan",
+                "• 1 Metal detektor",
+                "• 1 Buah kabel charger",
+                "",
+                "Dalam keadaan baik, aman dan lengkap",
+              ];
+              return lines.join("\n");
+            },
+          },
+        ];
 
-      /** Format date into “12 September 2025” with optional day name */
-      function formatDate(value, withDay = false) {
-        const date = parseDateLocal(value);
-        if (isNaN(date)) return withDay ? "" : { day: "", dateStr: "" };
-        const d = date.getDate();
-        const m = MONTHS[date.getMonth()];
-        const y = date.getFullYear();
-        const day = DAYS[date.getDay()];
-        return withDay ? `${day}, ${d} ${m} ${y}` : { day, dateStr: `${d} ${m} ${y}` };
-      }
-
-      /** Normalize time: accepts 20:00 / 2000 / 745 → 20:00 / 07:45 */
-      function normalizeTime(raw) {
-        if (!raw) return "";
-        let s = String(raw)
-          .trim()
-          .replace(/[^0-9:]/g, "");
-        if (/^\d{1,4}$/.test(s)) {
-          if (s.length === 1) s = "0" + s + "00";
-          if (s.length === 2) s = s + "00";
-          if (s.length === 3) s = "0" + s;
-          s = s.slice(0, 2) + ":" + s.slice(2);
-        }
-        const m = s.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
-        return m ? `${m[1].padStart(2, "0")}:${m[2]}` : "";
-      }
-
-      /** Greet by hour */
-      const greetByHour = (h) => (h < 11 ? "Pagi" : h < 16 ? "Siang" : "Malam");
-
-      /** Guess greet using provided jam or current hour */
-      function guessGreet(jamVal) {
-        const n = normalizeTime(jamVal || "");
-        const hour = n ? parseInt(n.split(":")[0], 10) : new Date().getHours();
-        return greetByHour(hour);
-      }
-
-      // --------------------------
-      // Templates definition
-      // --------------------------
-      const templates = [
-        {
-          id: "unit-bjm-masuk",
-          name: "Template Unit Banjarmasin Masuk",
-          fields: [
-            { key: "tanggal", label: "Tanggal", type: "date", span: 6 },
-            { key: "jam", label: "Jam (24h, WITA)", type: "time-24", span: 6 },
-            { key: "nopol", label: "Nopol", span: 6 },
-            { key: "vendor", label: "Vendor", span: 6, default: "Jeje", datalist: "vendor-list" },
-          ],
-          render: ({ greet, tanggal, hari, nopol, vendor, jam }) =>
-            `${ID_FLAG} *Selamat ${greet}* ${ID_FLAG}
-*SPX DC Balikpapan >< PT. KRESNA JAGANNATHA MANDIRI*
-
-*Mohon izin melaporkan*
-*Hari       : ${hari}*
-*Tanggal    : ${tanggal}*
-*Nopol      : ${nopol}*
-*Vendor     : ${vendor}*
-*Jam        : ${jam} WITA*
-*Note       : Telah tiba di Balikpapan Barat DC*
-
-@~Rizky
-@~rickyv satwika
-@+62 877-7624-0125`,
-        },
-        {
-          id: "patroli",
-          name: "Template Patroli",
-          fields: [
-            { key: "tanggal", label: "Tanggal", type: "date", span: 6 },
-            { key: "jam", label: "Pukul (24h, WITA)", type: "time-24", span: 6 },
-            { key: "petugas", label: "Petugas", span: 6 },
-            { key: "regu", label: "Regu", span: 6, default: "2" },
-          ],
-          render: ({ greet, tanggal, hari, jam, petugas, regu }) =>
-            `*PT.KRESNA JAGANNATHA MANDIRI*
-_________________________________
-*SPX EXPRESS BALIKPAPAN BARAT DC*
-_________________________________
-Selamat ${greet} Komandan KJM / Pimpinan SPX
-Mohon izin melaporkan, Komandan
-*Hari       : ${hari}*
-*Tanggal    : ${tanggal}*
-*Pukul      : ${jam} WITA*
-*Lokasi     : Balikpapan Barat DC*
-*Perihal    : Pengecekan pers di setiap flor dan patroli situasi gudang SPX Express Balikpapan Barat DC*
-
-*Petugas    : ( ${petugas} ) Regu ${regu}*
-
-Melaporkan kembali situasi dan kondisi area Gudang dan Parkiran SPX EXPRESS BALIKPAPAN BARAT DC
-
-*Keterangan*
-• Patroli all area SPX EXPRESS BALIKPAPAN BARAT DC
-• Situasi area aman kondusif.
-• Inventaris dalam keadaan lengkap dan aman`,
-        },
-        {
-          id: "loker",
-          name: "Template Loker (Inventaris Security)",
-          fields: [{ key: "tanggalfull", label: "Hari, Tanggal", type: "date", span: 6 }],
-          render: ({ greet, tanggalfull }) =>
-            `*Selamat ${greet} Komandan*
-*SPX DC Balikpapan >< PT. KRESNA JAGANNATHA MANDIRI*
-
-*${tanggalfull}*
-*Mohon izin melaporkan kelengkapan inventaris Security*
-
-Rincian inventaris :
-• 1 Jas hujan warna kuning
-• 1 Stel sepatu boots
-• 2 HT Wlan
-• 1 Metal detektor
-• 1 Buah kabel charger
-Dalam keadaan baik, aman dan lengkap`,
-        },
-      ];
-
-      // --------------------------
-      // UI: fields & inputs
-      // --------------------------
-      function fieldInputHTML(f) {
-        const req = f.optional ? "" : 'required aria-required="true"';
-        const name = `name="${f.key}"`;
-
-        if (f.type === "date") {
-          return `<input type="date" id="f-${f.key}" ${name} data-key="${f.key}" ${req} autocomplete="off" />`;
-        }
-        if (f.type === "time-24") {
-          const hintId = `hint-${f.key}`;
-          return `<input id="f-${f.key}" ${name} data-key="${f.key}" inputmode="numeric"
-                      autocapitalize="off" autocomplete="off" enterkeyhint="done"
-                      placeholder="HH:MM (24h)" aria-describedby="${hintId}"
-                      pattern="^([01]?\\d|2[0-3]):[0-5]\\d$"
-                      maxlength="5"
-                      value="${f.default ?? ""}" ${req} />
-                    <div id="${hintId}" class="inline-hint" title="Format HH:MM, contoh 20:00">Ketik 20:00 / 2000 / 745 → jadi 07:45</div>`;
-        }
-        const listAttr = f.datalist ? ` list="${f.datalist}"` : "";
-        return `<input id="f-${f.key}" ${name} data-key="${f.key}" placeholder="${f.label}"
-                    value="${f.default ?? ""}"${listAttr} ${req} autocomplete="off" />`;
-      }
-
-      /** Render inputs for the selected template */
-      function renderFields(tpl) {
-        const container = $("#fields");
-        container.innerHTML = "";
-        tpl.fields.forEach((f) => {
-          const wrap = document.createElement("div");
-          wrap.className = `col-${f.span || 6}`;
-          wrap.innerHTML = `<label for="f-${f.key}">${f.label}</label>${fieldInputHTML(f)}`;
-          container.appendChild(wrap);
-        });
-
-        // normalize time on blur
-        container.querySelectorAll('input[data-key][placeholder*="24h"]').forEach((el) => {
-          el.addEventListener("blur", () => {
-            const n = normalizeTime(el.value);
-            if (n) el.value = n;
-          });
-        });
-
-        // default today for any date field (only if empty)
-        container.querySelectorAll('input[type="date"]').forEach((el) => {
-          if (!el.value) el.value = todayLocalISO();
-        });
-      }
-
-      // --------------------------
-      // Collectors & validation
-      // --------------------------
-      function readDate(el, key) {
-        if (!el.value) return {};
-        if (key === "tanggalfull") return { tanggalfull: formatDate(el.value, true) };
-        const { day, dateStr } = formatDate(el.value);
-        return { hari: day, tanggal: dateStr };
-      }
-      function readTime(el, key) {
-        return { [key]: normalizeTime(el.value) };
-      }
-      function readText(el, key) {
-        let val = (el?.value || "").trim();
-        if (key === "nopol") val = val.toUpperCase();
-        return { [key]: val };
-      }
-      const merge = (...o) => Object.assign({}, ...o);
-
-      function collectValues() {
-        const tpl = currentTemplate();
-        let values = {};
-        tpl.fields.forEach((f) => {
-          const el = document.querySelector(`#f-${f.key}`);
-          if (!el) return;
-          if (f.type === "date") values = merge(values, readDate(el, f.key));
-          else if (f.type === "time-24") values = merge(values, readTime(el, f.key));
-          else values = merge(values, readText(el, f.key));
-        });
-        const timeField = tpl.fields.find((x) => x.type === "time-24");
-        const jamVal = timeField ? values[timeField.key] : "";
-        values.greet = guessGreet(jamVal);
-        return values;
-      }
-
-      function showToast(msg) {
-        const toast = $("#toast");
-        toast.textContent = msg;
-        toast.classList.add("show");
-        if (showToast._t) clearTimeout(showToast._t);
-        showToast._t = setTimeout(() => toast.classList.remove("show"), 2500);
-      }
-
-      /** Validate fields, focus first invalid, and normalize time */
-      function validate() {
-        const tpl = currentTemplate();
-        for (const f of tpl.fields) {
-          const el = document.querySelector(`#f-${f.key}`);
-          const val = (el?.value || "").trim();
-
-          if (!f.optional && !val) {
-            showToast(`${f.label} wajib diisi`);
-            el.focus();
-            el.scrollIntoView({ behavior: "smooth", block: "center" });
-            return false;
+        // The rest of the JavaScript logic remains the same
+        const todayLocalISO = () => new Date().toISOString().slice(0, 10);
+        const parseDateLocal = (iso) => {
+          const [y, m, d] = iso.split("-").map(Number);
+          return new Date(y, m - 1, d);
+        };
+        const formatDate = (value, withDay = false) => {
+          const date = parseDateLocal(value);
+          if (isNaN(date)) return withDay ? "" : { day: "", dateStr: "" };
+          const d = date.getDate();
+          const m = MONTHS[date.getMonth()];
+          const y = date.getFullYear();
+          const day = DAYS[date.getDay()];
+          return withDay ? `${day}, ${d} ${m} ${y}` : { day, dateStr: `${d} ${m} ${y}` };
+        };
+        const normalizeTime = (rawTime) => {
+          if (!rawTime) return "";
+          const digits = String(rawTime).replace(/\D/g, "");
+          let h, m;
+          if (digits.length === 1) {
+            h = `0${digits}`;
+            m = "00";
+          } else if (digits.length === 2) {
+            h = digits;
+            m = "00";
+          } else if (digits.length === 3) {
+            h = `0${digits[0]}`;
+            m = digits.slice(1);
+          } else if (digits.length === 4) {
+            h = digits.slice(0, 2);
+            m = digits.slice(2);
+          } else {
+            return "";
           }
-          if (f.type === "time-24" && val) {
-            const normalized = normalizeTime(val);
-            if (!normalized) {
-              showToast(`Format ${f.label} tidak valid (contoh 20:00)`);
+          if (parseInt(h, 10) > 23 || parseInt(m, 10) > 59) return "";
+          return `${h}:${m}`;
+        };
+        const greetByHour = (h) => {
+          if (h < 11) return "Pagi";
+          if (h < 15) return "Siang";
+          if (h < 19) return "Sore";
+          return "Malam";
+        };
+        const guessGreet = (jamVal) => {
+          const normalizedTime = normalizeTime(jamVal || "");
+          const hour = normalizedTime ? parseInt(normalizedTime.split(":")[0], 10) : new Date().getHours();
+          return greetByHour(hour);
+        };
+        const showToast = (msg) => {
+          DOM.toast.textContent = msg;
+          DOM.toast.classList.add("show");
+          setTimeout(() => DOM.toast.classList.remove("show"), 2500);
+        };
+        const renderFields = (tpl) => {
+          DOM.fieldsContainer.innerHTML = "";
+          tpl.fields.forEach((field) => {
+            const wrap = document.createElement("div");
+            wrap.className = `col-${field.span || 6}`;
+            const label = `<label for="f-${field.key}">${field.label}</label>`;
+            let inputHTML = "";
+            const commonAttrs = `id="f-${field.key}" data-key="${field.key}" autocomplete="off" required`;
+            switch (field.type) {
+              case "date":
+                inputHTML = `<input type="date" ${commonAttrs} value="${todayLocalISO()}" />`;
+                break;
+              case "time-24":
+                inputHTML = `<input type="text" ${commonAttrs} inputmode="numeric" placeholder="HH:MM" maxlength="5" value="${
+                  field.default ?? ""
+                }" />`;
+                break;
+              default:
+                const listAttr = field.datalist ? `list="${field.datalist}"` : "";
+                inputHTML = `<input type="text" ${commonAttrs} placeholder="${field.label}" value="${
+                  field.default ?? ""
+                }" ${listAttr} />`;
+                break;
+            }
+            wrap.innerHTML = label + inputHTML;
+            DOM.fieldsContainer.appendChild(wrap);
+          });
+        };
+        const getCurrentTemplate = () => {
+          const id = DOM.tplSelect.value;
+          return templates.find((t) => t.id === id) || templates[0];
+        };
+        const collectValues = () => {
+          const tpl = getCurrentTemplate();
+          const values = {};
+          tpl.fields.forEach((field) => {
+            const el = $(`#f-${field.key}`);
+            const val = el.value.trim();
+            switch (field.type) {
+              case "date":
+                if (field.key === "tanggalfull") {
+                  values.tanggalfull = formatDate(val, true);
+                } else {
+                  const { day, dateStr } = formatDate(val);
+                  values.hari = day;
+                  values.tanggal = dateStr;
+                }
+                break;
+              case "time-24":
+                values[field.key] = normalizeTime(val);
+                break;
+              default:
+                values[field.key] = field.key === "nopol" ? val.toUpperCase() : val;
+                break;
+            }
+          });
+          const timeValue = values.jam || "";
+          values.greet = guessGreet(timeValue);
+          return values;
+        };
+        const validateFields = () => {
+          for (const field of getCurrentTemplate().fields) {
+            const el = $(`#f-${field.key}`);
+            if (!el.value.trim()) {
+              showToast(`${field.label} wajib diisi`);
               el.focus();
-              el.scrollIntoView({ behavior: "smooth", block: "center" });
               return false;
             }
-            el.value = normalized; // write back
+            if (field.type === "time-24" && !normalizeTime(el.value)) {
+              showToast(`Format ${field.label} tidak valid (contoh: 20:00 atau 2000)`);
+              el.focus();
+              return false;
+            }
           }
-        }
-        return true;
-      }
-
-      // --------------------------
-      // Actions (generate / copy / open WA)
-      // --------------------------
-      function generate() {
-        if (!validate()) return "";
-        const vals = collectValues();
-        const output = currentTemplate().render(vals);
-        $("#output").value = output;
-        return output;
-      }
-
-      function openWhatsApp(text) {
-        const waText = text;
-
-        if (navigator.share) {
-          navigator.share({ text: waText }).catch(() => openWhatsApp._fallback(waText));
-          return;
-        }
-        openWhatsApp._fallback(waText);
-      }
-
-      openWhatsApp._fallback = function (waText) {
-        const encoded = encodeURIComponent(waText);
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-        if (isMobile) {
-          window.location.href = `whatsapp://send?text=${encoded}`;
-          setTimeout(() => {
-            window.open(`https://wa.me/?text=${encoded}`, "_blank", "noopener,noreferrer");
-          }, 600);
-          return;
-        }
-        const w = window.open(`https://wa.me/?text=${encoded}`, "_blank", "noopener,noreferrer");
-        if (w) w.opener = null;
-      };
-
-      // --------------------------
-      // Template helpers
-      // --------------------------
-      const tplSelect = $("#tpl");
-      function currentTemplate() {
-        const id = tplSelect.value || templates[0].id;
-        return templates.find((t) => t.id === id);
-      }
-
-      function populateTemplateSelect() {
-        templates.forEach((t) => {
-          const o = document.createElement("option");
-          o.value = t.id;
-          o.textContent = t.name;
-          tplSelect.appendChild(o);
-        });
-      }
-
-      populateTemplateSelect();
-      renderFields(currentTemplate());
-
-      tplSelect.addEventListener("change", () => {
-        renderFields(currentTemplate());
-        $("#output").value = ""; // clear old output on switch
-      });
-
-      $("#btn-gen").addEventListener("click", () => generate());
-
-      $("#btn-copy").addEventListener("click", async () => {
-        const text = $("#output").value.trim();
-        if (!text) return;
-        try {
-          await navigator.clipboard.writeText(text);
-          const b = $("#btn-copy"),
-            t = b.textContent;
-          b.textContent = "Copied ✓";
-          setTimeout(() => (b.textContent = t), 1200);
-        } catch {
-          alert("Gagal copy. Salin manual.");
-        }
-      });
-
-      $("#btn-wa").addEventListener("click", () => {
-        const text = $("#output").value.trim();
-        if (!text) return;
-        openWhatsApp(text);
-      });
+          return true;
+        };
+        const generate = () => {
+          if (!validateFields()) return;
+          const values = collectValues();
+          const outputText = getCurrentTemplate().render(values);
+          DOM.output.value = outputText;
+        };
+        const handleTemplateChange = () => {
+          renderFields(getCurrentTemplate());
+          DOM.output.value = "";
+        };
+        const handleCopyClick = async () => {
+          const text = DOM.output.value.trim();
+          if (!text) return;
+          try {
+            await navigator.clipboard.writeText(text);
+            const originalText = DOM.btnCopy.textContent;
+            DOM.btnCopy.textContent = "Copied ✓";
+            setTimeout(() => (DOM.btnCopy.textContent = originalText), 1500);
+          } catch {
+            showToast("Gagal menyalin. Silakan salin manual.");
+          }
+        };
+        const handleWhatsAppClick = () => {
+          const text = DOM.output.value.trim();
+          if (!text) return;
+          const encodedText = encodeURIComponent(text);
+          const url = `https://wa.me/?text=${encodedText}`;
+          window.open(url, "_blank", "noopener,noreferrer");
+        };
+        const handleTimeInputBlur = (e) => {
+          if (e.target.matches('input[data-key][placeholder="HH:MM"]')) {
+            const normalized = normalizeTime(e.target.value);
+            if (normalized) e.target.value = normalized;
+          }
+        };
+        const init = () => {
+          templates.forEach((t) => {
+            DOM.tplSelect.add(new Option(t.name, t.id));
+          });
+          renderFields(getCurrentTemplate());
+          DOM.tplSelect.addEventListener("change", handleTemplateChange);
+          DOM.btnGen.addEventListener("click", generate);
+          DOM.btnCopy.addEventListener("click", handleCopyClick);
+          DOM.btnWa.addEventListener("click", handleWhatsAppClick);
+          DOM.fieldsContainer.addEventListener("blur", handleTimeInputBlur, true);
+        };
+        init();
+      })();
     </script>
   </body>
 </html>
