@@ -115,7 +115,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 textarea {
   min-height: 220px;
   white-space: pre-wrap;
-  font-family: inherit; /* <- emoji will render using system-ui */
+  font-family: inherit;
 }
 .toolbar {
   display: flex;
@@ -136,7 +136,6 @@ button {
 }
 button.primary {
   background: var(--accent);
-  /* A better way to darken the border color */
   border-color: color-mix(in oklab, var(--accent), var(--crust) 30%);
   color: var(--crust);
   font-weight: 700;
