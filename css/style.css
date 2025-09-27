@@ -34,7 +34,7 @@ body {
   margin: 0;
   background: linear-gradient(180deg, var(--crust), var(--mantle) 30%, var(--crust) 100%);
   color: var(--text);
-  font: 16px/1.45 "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   min-height: 100vh;
   display: grid;
   place-items: start center;
