@@ -242,7 +242,7 @@ button.danger:hover {
   align-items: center;
   gap: 12px;
   font-family: monospace;
-  font-size: 1.05em;
+  font-size: 14px;
 }
 .nopol-item:hover {
   background-color: var(--surface0);
